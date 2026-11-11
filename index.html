@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Pizza, Great PdP: Sejarah Lagu Kebangsaan Malaysia</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #F7E7CE;
+            color: #4A3525;
+            user-select: none;
+        }
+        .font-heading {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Spring Back & Shake animation for incorrect answer */
+        @keyframes springBack {
+            0% { transform: scale(1) translateY(0); }
+            20% { transform: scale(1.15) translateY(-25px); }
+            50% { transform: scale(0.85) translateX(-20px); }
+            70% { transform: scale(1.1) translateX(20px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+        .animate-spring-back {
+            animation: springBack 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Penalty Float Floating Text */
+        @keyframes penaltyFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-35px) scale(1.2); }
+        }
+        .penalty-anim {
+            animation: penaltyFloat 1s forwards ease-out;
+        }
+
+        /* Order Ticket styling */
+        .order-ticket {
+            background: #FFFDF0;
+            border-left: 8px solid #E2583E;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            position: relative;
+        }
+        .order-ticket::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: radial-gradient(circle, transparent, transparent 50%, #FFFDF0 50%, #FFFDF0 100%);
+            background-size: 12px 12px;
+        }
+
+        .btn-pizza {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-pizza:active {
+            transform: scale(0.95);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7E7CE;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D9C4A5;
+            border-radius: 4px;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .shadow-2xl, .shadow-lg { box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- AUDIO ELEMENT FOR NEGARAKU MP3 SNIPPETS -->
+    <audio id="negarakuAudio" src="negaraku_1957.mp3" preload="auto"></audio>
+
+    <!-- HEADER / STATUS BAR -->
+    <header class="bg-[#8C5A3C] text-[#FFFDF9] p-4 border-b-4 border-[#6B3E26] shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-[#E2583E] p-2 rounded-2xl border-2 border-white shadow-inner">
+                    <i class="fa-solid fa-pizza-slice text-2xl text-yellow-300"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading text-xl md:text-2xl tracking-wide text-yellow-300">GOOD PIZZA, GREAT PDP!</h1>
+                    <p class="text-xs text-amber-100 font-bold">Sejarah Lagu Kebangsaan Malaysia</p>
+                </div>
+            </div>
+
+            <!-- Student Profile & Score Display -->
+            <div id="topHeaderStats" class="hidden flex items-center gap-4">
+                <div class="hidden sm:block text-right">
+                    <div id="displayStudentName" class="font-bold text-sm text-yellow-200">Murid: -</div>
+                    <div id="displayStudentClass" class="text-xs text-amber-100">Kelas: -</div>
+                </div>
+                <div class="bg-[#F7E7CE] text-[#5A4036] px-4 py-1.5 rounded-2xl font-bold border-2 border-[#D9C4A5] flex items-center gap-2 relative shadow-inner">
+                    <i class="fa-solid fa-star text-yellow-500 text-lg"></i>
+                    <span class="text-xs md:text-sm">Markah: <span id="currentScore" class="text-lg md:text-xl text-[#E2583E] font-heading">100</span></span>
+                    <span id="penaltyFloatText" class="hidden absolute -bottom-8 right-0 text-red-600 font-extrabold text-xs bg-red-100 border border-red-400 px-2 py-0.5 rounded-md shadow-md penalty-anim">-2 Markah!</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-5xl mx-auto w-full p-4 flex-grow">
+
+        <!-- REGISTRATION MODAL / LANDING SCREEN -->
+        <section id="screenRegister" class="bg-[#FFFDF9] p-6 md:p-10 rounded-3xl border-4 border-[#8C5A3C] shadow-2xl max-w-lg mx-auto my-8 text-center relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-200 rounded-full opacity-40 pointer-events-none"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-red-200 rounded-full opacity-40 pointer-events-none"></div>
+
+            <div class="inline-block bg-[#F6C852] p-4 rounded-full border-4 border-[#8C5A3C] mb-4 shadow-md animate-bounce">
+                <i class="fa-solid fa-store text-4xl text-[#8C5A3C]"></i>
+            </div>
+
+            <h2 class="font-heading text-2xl md:text-3xl text-[#8C5A3C] mb-2">Selamat Datang ke Restoran Pizza Negaraku!</h2>
+            <p class="text-sm text-gray-600 mb-6 font-bold">Daftar maklumat murid untuk memulakan aktiviti PdP & Pentaksiran Interaktif.</p>
+
+            <form id="formRegister" onsubmit="handleStartApp(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-[#8C5A3C] uppercase mb-1">Nama Penuh Murid:</label>
+                    <input type="text" id="inputName" required placeholder="Contoh: Ahmad Zaki bin Ali" class="w-full px-4 py-3 rounded-2xl border-2 border-[#D9C4A5] focus:outline-none focus:border-[#E2583E] font-bold bg-[#FFFDF0]">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#8C5A3C] uppercase mb-1">Kelas / Tahun:</label>
+                    <input type="text" id="inputClass" required placeholder="Contoh: 5 Cemerlang" class="w-full px-4 py-3 rounded-2xl border-2 border-[#D9C4A5] focus:outline-none focus:border-[#E2583E] font-bold bg-[#FFFDF0]">
+                </div>
+                
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+                    <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
+                    <span><strong>Nota Pentaksiran:</strong> Markah permulaan ialah <strong>100 markah</strong>. Setiap jawapan yang salah akan menyebabkan ramuan melompat balik dan <strong>penolakan 2 markah</strong>!</span>
+                </div>
+
+                <button type="submit" class="btn-pizza w-full bg-[#72A265] hover:bg-[#5E8B52] text-white font-heading text-lg py-3.5 rounded-2xl border-b-4 border-[#486B3E] shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> Buka Kedai & Mula PdP
+                </button>
+            </form>
+        </section>
+
+        <!-- STATION STEP NAVIGATION TABS -->
+        <nav id="stationTabs" class="hidden grid-cols-4 gap-2 mb-6">
+            <button id="tab1" onclick="goToStep(1)" class="p-2.5 rounded-2xl font-heading text-xs md:text-sm text-center border-2 bg-white text-gray-400 border-gray-300 transition shadow-sm">
+                <span class="block text-lg">📦</span> 1. Lirik & Maksud
+            </button>
+            <button id="tab2" onclick="goToStep(2)" class="p-2.5 rounded-2xl font-heading text-xs md:text-sm text-center border-2 bg-white text-gray-400 border-gray-300 transition shadow-sm">
+                <span class="block text-lg">📜</span> 2. Dapur Sejarah
+            </button>
+            <button id="tab3" onclick="goToStep(3)" class="p-2.5 rounded-2xl font-heading text-xs md:text-sm text-center border-2 bg-white text-gray-400 border-gray-300 transition shadow-sm">
+                <span class="block text-lg">🎤</span> 3. Karaoke & Etika
+            </button>
+            <button id="tab4" onclick="goToStep(4)" class="p-2.5 rounded-2xl font-heading text-xs md:text-sm text-center border-2 bg-white text-gray-400 border-gray-300 transition shadow-sm">
+                <span class="block text-lg">🍕</span> 4. Pizza Jati Diri
+            </button>
+        </nav>
+
+        <!-- STESEN 1: KOTAK KEJUTAN LIRIK & MAKSUD -->
+        <section id="station1" class="hidden space-y-6">
+            <div class="bg-[#FFFDF9] p-6 rounded-3xl border-4 border-[#8C5A3C] shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b-2 border-amber-100 pb-3 mb-4">
+                    <div>
+                        <span class="bg-[#E2583E] text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Stesen 1</span>
+                        <h3 class="font-heading text-xl text-[#8C5A3C] inline-block ml-2">Kotak Kejutan Lirik & Maksud Lagu Negaraku</h3>
+                    </div>
+                    <p class="text-xs text-gray-500 font-bold">Buka kotak, dengar audio, dan pilih ramuan maksud yang tepat!</p>
+                </div>
+
+                <!-- Blind Boxes Container -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <button onclick="openBlindBox(0)" id="blindBox0" class="btn-pizza bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 rounded-2xl p-4 text-center shadow-md relative overflow-hidden group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🎁</div>
+                        <div class="font-heading text-xs text-[#8C5A3C]">Kotak Lirik 1</div>
+                        <div id="boxStatus0" class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full mt-1 inline-block">Belum Dibuka</div>
+                    </button>
+                    <button onclick="openBlindBox(1)" id="blindBox1" class="btn-pizza bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 rounded-2xl p-4 text-center shadow-md relative overflow-hidden group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🎁</div>
+                        <div class="font-heading text-xs text-[#8C5A3C]">Kotak Lirik 2</div>
+                        <div id="boxStatus1" class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full mt-1 inline-block">Belum Dibuka</div>
+                    </button>
+                    <button onclick="openBlindBox(2)" id="blindBox2" class="btn-pizza bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 rounded-2xl p-4 text-center shadow-md relative overflow-hidden group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🎁</div>
+                        <div class="font-heading text-xs text-[#8C5A3C]">Kotak Lirik 3</div>
+                        <div id="boxStatus2" class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full mt-1 inline-block">Belum Dibuka</div>
+                    </button>
+                    <button onclick="openBlindBox(3)" id="blindBox3" class="btn-pizza bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 rounded-2xl p-4 text-center shadow-md relative overflow-hidden group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🎁</div>
+                        <div class="font-heading text-xs text-[#8C5A3C]">Kotak Lirik 4</div>
+                        <div id="boxStatus3" class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full mt-1 inline-block">Belum Dibuka</div>
+                    </button>
+                </div>
+
+                <!-- Active Box Display Area -->
+                <div id="activeBoxCard" class="bg-amber-50 rounded-2xl p-5 border-2 border-amber-200 hidden">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span id="activeBoxBadge" class="bg-[#8C5A3C] text-yellow-300 font-heading text-xs px-3 py-1 rounded-xl">Lirik Selected</span>
+                            <button id="btnReplayAudio" onclick="replayCurrentBoxAudio()" class="bg-[#E2583E] hover:bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-xl flex items-center gap-1.5 shadow">
+                                <i class="fa-solid fa-volume-high"></i> Mainkan Audio MP3
+                            </button>
+                        </div>
+                        <span id="audioPlayingIndicator" class="text-xs text-green-700 font-bold hidden flex items-center gap-1">
+                            <i class="fa-solid fa-compact-disc animate-spin"></i> Audio Loop Dimainkan... (<span id="audioTimeDisplay">0s</span>)
+                        </span>
+                    </div>
+
+                    <!-- Lyric Display Box -->
+                    <div class="bg-white p-4 rounded-xl border border-amber-200 text-center mb-5 shadow-sm">
+                        <h4 id="activeLyricText" class="font-heading text-xl text-[#8C5A3C] tracking-wide">"..."</h4>
+                    </div>
+
+                    <p class="text-xs font-bold text-[#8C5A3C] uppercase mb-2">Pilih Ramuan Maksud yang Betul untuk Dimasukkan ke Pizza:</p>
+
+                    <!-- Topping Options Shelf -->
+                    <div id="meaningOptionsShelf" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- Dynamic options inserted via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real Pizza Crust Visual & Assembly -->
+            <div class="bg-[#8C5A3C] p-6 rounded-3xl border-4 border-[#6B3E26] text-center text-white shadow-2xl relative">
+                <h4 class="font-heading text-xl mb-3 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-utensils text-yellow-400"></i> Dapur Pembakaran Pizza Negaraku
+                </h4>
+                
+                <!-- Pizza Crust Visual Board -->
+                <div id="pizzaCrustVisual" class="w-64 h-64 md:w-72 md:h-72 mx-auto bg-[#F6C852] rounded-full border-8 border-[#D9A62E] shadow-2xl relative overflow-hidden flex items-center justify-center p-4 transition-transform duration-300">
+                    <!-- Sauce Layer -->
+                    <div class="absolute inset-3 bg-[#E2583E] rounded-full opacity-90 border-4 border-[#C0392B]"></div>
+                    <!-- Cheese Layer -->
+                    <div class="absolute inset-6 bg-[#F39C12] rounded-full opacity-80 border-2 border-yellow-300"></div>
+                    
+                    <span id="pizzaPlateEmptyText" class="relative z-10 text-xs font-bold text-white bg-black/60 px-4 py-2 rounded-full shadow">
+                        Buka Kotak & Pilih Ramuan!
+                    </span>
+
+                    <!-- SVG Toppings Graphic Container -->
+                    <div id="placedToppingsSvgContainer" class="absolute inset-0 z-20 pointer-events-none p-4 grid grid-cols-2 items-center justify-items-center gap-2"></div>
+                </div>
+
+                <div id="pizzaPlateContentText" class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-amber-100">
+                    <!-- Text badges of placed toppings -->
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <div></div>
+                <button id="btnNextStep1" onclick="goToStep(2)" disabled class="btn-pizza opacity-50 bg-gray-400 text-white font-heading text-base px-8 py-3 rounded-2xl cursor-not-allowed shadow-md">
+                    Teruskan ke Stesen 2 <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STESEN 2: DAPUR SEJARAH & NAMA LAGU KEBANGSAAN -->
+        <section id="station2" class="hidden space-y-6">
+            <div class="bg-[#FFFDF9] p-6 rounded-3xl border-4 border-[#8C5A3C] shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b-2 border-amber-100 pb-3 mb-4">
+                    <div>
+                        <span class="bg-[#E2583E] text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Stesen 2</span>
+                        <h3 class="font-heading text-xl text-[#8C5A3C] inline-block ml-2">Dapur Sejarah & Nama Lagu Kebangsaan</h3>
+                    </div>
+                    <p class="text-xs text-gray-500 font-bold">Selesaikan Pesanan Tiket Pelanggan Sejarah!</p>
+                </div>
+
+                <!-- History Order Ticket Carousel -->
+                <div id="historyTicketContainer" class="order-ticket p-6 rounded-2xl mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <span id="ticketNumberBadge" class="bg-[#8C5A3C] text-yellow-300 text-xs font-heading px-3 py-1 rounded-full">TIKET PESANAN #1 / 4</span>
+                        <span id="ticketTopicBadge" class="text-xs font-bold text-gray-500 uppercase">Sejarah Penciptaan 1957</span>
+                    </div>
+
+                    <h4 id="ticketQuestionText" class="font-heading text-lg text-[#8C5A3C] mb-4">...</h4>
+
+                    <!-- History Quiz Options Shelf -->
+                    <div id="historyOptionsShelf" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- Options generated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Ticket Progress Dots -->
+                <div class="flex justify-center items-center gap-2">
+                    <div id="dot0" class="w-3 h-3 rounded-full bg-gray-300"></div>
+                    <div id="dot1" class="w-3 h-3 rounded-full bg-gray-300"></div>
+                    <div id="dot2" class="w-3 h-3 rounded-full bg-gray-300"></div>
+                    <div id="dot3" class="w-3 h-3 rounded-full bg-gray-300"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="goToStep(1)" class="btn-pizza bg-gray-200 hover:bg-gray-300 text-[#8C5A3C] font-bold px-6 py-2.5 rounded-2xl text-sm">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                </button>
+                <button id="btnNextStep2" onclick="goToStep(3)" disabled class="btn-pizza opacity-50 bg-gray-400 text-white font-heading text-base px-8 py-3 rounded-2xl cursor-not-allowed shadow-md">
+                    Teruskan ke Stesen 3 <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STESEN 3: STUDIO KARAOKE & ETIKA MENYANYI -->
+        <section id="station3" class="hidden space-y-6">
+            <div class="bg-[#FFFDF9] p-6 rounded-3xl border-4 border-[#8C5A3C] shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b-2 border-amber-100 pb-3 mb-4">
+                    <div>
+                        <span class="bg-[#E2583E] text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Stesen 3</span>
+                        <h3 class="font-heading text-xl text-[#8C5A3C] inline-block ml-2">Studio Karaoke & Etika Menyanyi</h3>
+                    </div>
+                    <p class="text-xs text-gray-500 font-bold">Hayati lagu Negaraku & Jawab soalan etika!</p>
+                </div>
+
+                <!-- Interactive Karaoke Player Section -->
+                <div class="bg-[#8C5A3C] p-6 rounded-2xl text-white shadow-lg mb-6 text-center relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="bg-red-500 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-microphone text-yellow-300"></i> Mode Karaoke
+                        </span>
+                        <button id="btnKaraokePlay" onclick="playFullKaraoke()" class="bg-yellow-400 hover:bg-yellow-300 text-[#8C5A3C] font-heading text-xs px-4 py-1.5 rounded-xl shadow border border-yellow-600 flex items-center gap-1.5">
+                            <i class="fa-solid fa-play"></i> Mainkan Lagu Negaraku (Penuh)
+                        </button>
+                    </div>
+
+                    <!-- Karaoke Highlight Lyric Box -->
+                    <div id="karaokeLyricsDisplay" class="space-y-3 py-4">
+                        <p id="kLine1" class="font-heading text-lg text-amber-200 transition-all duration-300">Negaraku, Tanah tumpahnya darahku</p>
+                        <p id="kLine2" class="font-heading text-lg text-amber-200 transition-all duration-300">Rakyat hidup, Bersatu dan maju</p>
+                        <p id="kLine3" class="font-heading text-lg text-amber-200 transition-all duration-300">Rahmat bahagia, Tuhan kurniakan</p>
+                        <p id="kLine4" class="font-heading text-lg text-amber-200 transition-all duration-300">Raja kita, Selamat bertakhta</p>
+                    </div>
+                </div>
+
+                <!-- Etika Quiz Section -->
+                <div class="bg-amber-50 p-5 rounded-2xl border-2 border-amber-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-heading text-base text-[#8C5A3C]">Soalan Etika & Penghayatan Lagu Kebangsaan</h4>
+                        <span id="etikaQuestionBadge" class="text-xs bg-amber-200 text-[#8C5A3C] font-bold px-2.5 py-0.5 rounded-full">Soalan 1 / 3</span>
+                    </div>
+
+                    <p id="etikaQuestionText" class="font-heading text-md text-[#8C5A3C] mb-4">...</p>
+
+                    <!-- Etika Options Shelf -->
+                    <div id="etikaOptionsShelf" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- Dynamic options -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="goToStep(2)" class="btn-pizza bg-gray-200 hover:bg-gray-300 text-[#8C5A3C] font-bold px-6 py-2.5 rounded-2xl text-sm">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                </button>
+                <button id="btnNextStep3" onclick="goToStep(4)" disabled class="btn-pizza opacity-50 bg-gray-400 text-white font-heading text-base px-8 py-3 rounded-2xl cursor-not-allowed shadow-md">
+                    Teruskan ke Stesen 4 <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STESEN 4: BINA PIZZA JATI DIRI -->
+        <section id="station4" class="hidden space-y-6">
+            <div class="bg-[#FFFDF9] p-6 rounded-3xl border-4 border-[#8C5A3C] shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b-2 border-amber-100 pb-3 mb-4">
+                    <div>
+                        <span class="bg-[#E2583E] text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Stesen 4</span>
+                        <h3 class="font-heading text-xl text-[#8C5A3C] inline-block ml-2">Bina Pizza Jati Diri & Perpaduan</h3>
+                    </div>
+                    <p class="text-xs text-gray-500 font-bold">Pilih 4 ramuan yang menggambarkan peranan Lagu Kebangsaan!</p>
+                </div>
+
+                <p class="text-sm font-bold text-[#8C5A3C] mb-4">
+                    Pilih ramuan nilai jati diri yang BETUL untuk melengkapkan Pizza Perpaduan Negara (Pilih 4 daripada 6 option):
+                </p>
+
+                <!-- Jati Diri Options Shelf -->
+                <div id="jatiDiriShelf" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                    <!-- Dynamic options generated via JS -->
+                </div>
+
+                <!-- Counter display -->
+                <div class="bg-amber-100 p-4 rounded-2xl text-center border border-amber-300">
+                    <span class="text-sm font-bold text-[#8C5A3C]">
+                        Ramuan Jati Diri Dipilih: <span id="selectedJatiCount" class="text-lg font-heading text-[#E2583E]">0</span> / 4
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="goToStep(3)" class="btn-pizza bg-gray-200 hover:bg-gray-300 text-[#8C5A3C] font-bold px-6 py-2.5 rounded-2xl text-sm">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                </button>
+                <button id="btnFinishAssessment" onclick="completeAssessment()" disabled class="btn-pizza opacity-50 bg-gray-400 text-white font-heading text-base px-8 py-3 rounded-2xl cursor-not-allowed shadow-md">
+                    Hantar & Selesai Pentaksiran <i class="fa-solid fa-check-double ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- REPORT CARD / ASSESSMENT RESULT SCREEN -->
+        <section id="screenReportCard" class="hidden space-y-6">
+            <div class="bg-[#FFFDF9] p-6 md:p-10 rounded-3xl border-4 border-[#8C5A3C] shadow-2xl relative">
+                
+                <!-- Report Card Header -->
+                <div class="text-center border-b-4 border-[#8C5A3C] pb-6 mb-6">
+                    <div class="inline-block bg-[#F6C852] p-3 rounded-full border-2 border-[#8C5A3C] mb-2">
+                        <i class="fa-solid fa-award text-3xl text-[#8C5A3C]"></i>
+                    </div>
+                    <h2 class="font-heading text-2xl md:text-3xl text-[#8C5A3C]">KAD LAPORAN PENTAKSIRAN PDP</h2>
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Sejarah Lagu Kebangsaan Malaysia</p>
+                </div>
+
+                <!-- Student Info Details -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 mb-6 text-xs md:text-sm">
+                    <div>
+                        <span class="block text-gray-500 text-[10px] uppercase font-bold">Nama Murid:</span>
+                        <strong id="rcStudentName" class="text-[#8C5A3C] font-heading text-base">-</strong>
+                    </div>
+                    <div>
+                        <span class="block text-gray-500 text-[10px] uppercase font-bold">Kelas:</span>
+                        <strong id="rcStudentClass" class="text-[#8C5A3C] font-heading text-base">-</strong>
+                    </div>
+                    <div>
+                        <span class="block text-gray-500 text-[10px] uppercase font-bold">Tarikh Pentaksiran:</span>
+                        <strong id="rcDate" class="text-[#8C5A3C] font-heading text-base">-</strong>
+                    </div>
+                    <div>
+                        <span class="block text-gray-500 text-[10px] uppercase font-bold">Kesalahan Penalti:</span>
+                        <strong id="rcPenalties" class="text-red-600 font-heading text-base">0 kali (-0 markah)</strong>
+                    </div>
+                </div>
+
+                <!-- Overall Grade & Badge Box -->
+                <div class="bg-[#8C5A3C] text-white p-6 rounded-2xl mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-inner">
+                    <div class="text-center md:text-left">
+                        <span class="text-xs text-amber-200 font-bold uppercase tracking-wider">Tahap Penguasaan (TP) Pentaksiran:</span>
+                        <h3 id="rcTpGrade" class="font-heading text-3xl md:text-4xl text-yellow-300 mt-1">TP 6 - SANGAT BAIK</h3>
+                        <p id="rcTpDesc" class="text-xs text-amber-100 mt-1 max-w-md">Menghayati, memahami lirik, etika, dan sejarah lagu kebangsaan serta mengamalkan nilai jati diri warganegara.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] text-[#8C5A3C] p-4 rounded-2xl text-center min-w-[140px] border-2 border-yellow-400">
+                        <span class="text-[10px] font-bold uppercase text-gray-500 block">Markah Akhir:</span>
+                        <span id="rcFinalScore" class="font-heading text-4xl text-[#E2583E]">100%</span>
+                    </div>
+                </div>
+
+                <!-- Station Score Breakdown -->
+                <div class="mb-6">
+                    <h4 class="font-heading text-base text-[#8C5A3C] mb-3 border-b pb-1">Pecahan Penguasaan Mengikut Stesen Aktiviti:</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex justify-between items-center">
+                            <span>📦 <strong>Stesen 1:</strong> Kotak Lirik & Maksud</span>
+                            <span id="rcS1Status" class="font-bold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">Selesai (100%)</span>
+                        </div>
+                        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex justify-between items-center">
+                            <span>📜 <strong>Stesen 2:</strong> Dapur Sejarah 1957</span>
+                            <span id="rcS2Status" class="font-bold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">Selesai (100%)</span>
+                        </div>
+                        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex justify-between items-center">
+                            <span>🎤 <strong>Stesen 3:</strong> Karaoke & Etika Nyanyian</span>
+                            <span id="rcS3Status" class="font-bold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">Selesai (100%)</span>
+                        </div>
+                        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex justify-between items-center">
+                            <span>🍕 <strong>Stesen 4:</strong> Pizza Jati Diri Warganegara</span>
+                            <span id="rcS4Status" class="font-bold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">Selesai (100%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Sign Verification Box -->
+                <div class="mt-8 pt-6 border-t-2 border-dashed border-gray-300 flex justify-between items-end text-xs text-gray-500">
+                    <div>
+                        <p>Status: <strong class="text-green-700">LULUS & DISAHKAN</strong></p>
+                        <p class="text-[10px] mt-1">Dicetak dari Sistem PdP Digital Lagu Kebangsaan Malaysia</p>
+                    </div>
+                    <div class="text-center border-t border-gray-400 w-48 pt-1">
+                        Tandatangan Guru Sejarah
+                    </div>
+                </div>
+
+                <!-- Action Buttons (No Print) -->
+                <div class="no-print mt-8 flex flex-col sm:flex-row justify-center gap-3">
+                    <button onclick="window.print()" class="btn-pizza bg-[#8C5A3C] hover:bg-[#6B3E26] text-white font-heading text-sm px-6 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-print"></i> Cetak / Simpan PDF Kad Laporan
+                    </button>
+                    <button onclick="restartApp()" class="btn-pizza bg-gray-200 hover:bg-gray-300 text-[#8C5A3C] font-heading text-sm px-6 py-3 rounded-2xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Mula Semula PdP
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="no-print bg-[#8C5A3C] text-amber-100 text-center py-3 text-xs border-t-2 border-[#6B3E26]">
+        Aktiviti PdP & Pentaksiran Interaktif Sejarah Tahun 5 • Lagu Kebangsaan Malaysia
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* APP STATE */
+        let studentData = {
+            name: '',
+            class: '',
+            score: 100,
+            penaltyCount: 0,
+            completedStations: [false, false, false, false]
+        };
+
+        /* SVG REALISTIC ENLARGED PIZZA TOPPINGS MAP */
+        const SVG_TOPPINGS = {
+            pepperoni: `<svg class="w-16 h-16 drop-shadow-xl animate-bounce" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#B71C1C" stroke="#795548" stroke-width="2.5"/><circle cx="14" cy="14" r="3.5" fill="#880E4F"/><circle cx="25" cy="22" r="3" fill="#880E4F"/><circle cx="16" cy="26" r="2.5" fill="#880E4F"/></svg>`,
+            capsicum: `<svg class="w-16 h-16 drop-shadow-xl animate-bounce" viewBox="0 0 40 40"><path d="M10,12 Q20,4 30,12 Q36,25 28,34 Q20,38 12,34 Q4,25 10,12 Z" fill="#2E7D32" stroke="#1B5E20" stroke-width="2.5"/><path d="M14,16 Q20,10 26,16" stroke="#4CAF50" stroke-width="3.5" fill="none"/></svg>`,
+            chicken: `<svg class="w-16 h-16 drop-shadow-xl animate-bounce" viewBox="0 0 40 40"><path d="M8,20 Q12,8 24,10 Q34,12 32,24 Q30,34 18,32 Q6,30 8,20 Z" fill="#FB8C00" stroke="#E65100" stroke-width="2.5"/><circle cx="18" cy="20" r="3.5" fill="#FFE0B2"/></svg>`,
+            prawn: `<svg class="w-16 h-16 drop-shadow-xl animate-bounce" viewBox="0 0 40 40"><path d="M10,25 Q12,10 25,10 Q34,10 32,22 Q30,30 20,32 Q12,32 10,25 Z" fill="#FF7043" stroke="#D84315" stroke-width="2.5"/><path d="M25,10 Q32,4 36,6" stroke="#FF7043" stroke-width="2.5" fill="none"/></svg>`,
+            mushroom: `<svg class="w-16 h-16 drop-shadow-xl animate-bounce" viewBox="0 0 40 40"><path d="M6,22 Q6,8 20,8 Q34,8 34,22 Z" fill="#D7CCC8" stroke="#5D4037" stroke-width="2.5"/><rect x="15" y="22" width="10" height="12" rx="3" fill="#EFEBE9" stroke="#5D4037" stroke-width="2.5"/></svg>`,
+            olive: `<svg class="w-16 h-16 drop-shadow-xl animate-bounce" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="#212121" stroke="#000000" stroke-width="2.5"/><circle cx="20" cy="20" r="6" fill="#F57F17"/></svg>`
+        };
+
+        /* STESEN 1 DATA: TIMESTAMPS EXACT USER REQUEST + AUTO REPEAT LOOP */
+        const BOX_DATA = [
+            {
+                id: 0,
+                lyric: "Negaraku, Tanah tumpahnya darahku",
+                startTime: 8.0,
+                endTime: 18.0,
+                toppingKey: "pepperoni",
+                toppingName: "Pepperoni",
+                correctMeaning: "Menyeru rakyat daripada pelbagai bangsa dan agama supaya hidup bersatu padu untuk mencapai kemajuan.",
+                distractors: [
+                    "Memohon doa rahmat dan kebahagiaan daripada Tuhan untuk raja.",
+                    "Memohon perlindungan tentera daripada serangan musuh luar.",
+                    "Perasaan gembira kerana negara mempunyai banyak sumber bahan mentah."
+                ]
+            },
+            {
+                id: 1,
+                lyric: "Rakyat hidup, Bersatu dan maju",
+                startTime: 19.0,
+                endTime: 30.0,
+                toppingKey: "capsicum",
+                toppingName: "Lada Hijau",
+                correctMeaning: "Seruan agar seluruh rakyat hidup bertoleransi dan bekerjasama demi kemajuan negara.",
+                distractors: [
+                    "Rakyat digalakkan berpindah ke bandar besar sahaja.",
+                    "Hanya satu kaum sahaja yang dibenarkan bekerja.",
+                    "Rakyat digalakkan bersaing secara tidak sihat."
+                ]
+            },
+            {
+                id: 2,
+                lyric: "Rahmat bahagia, Tuhan kurniakan",
+                startTime: 31.0,
+                endTime: 42.0,
+                toppingKey: "chicken",
+                toppingName: "Ayam Kebahagiaan",
+                correctMeaning: "Memohon kurniaan rahmat, kebahagiaan dan kesejahteraan daripada Tuhan.",
+                distractors: [
+                    "Memohon kekayaan harta benda yang melimpah ruah.",
+                    "Meminta hujan turun setiap hari di seluruh kawasan.",
+                    "Mengagungkan raja-raja dari luar negara."
+                ]
+            },
+            {
+                id: 3,
+                lyric: "Raja kita, Selamat bertakhta",
+                startTime: 43.0,
+                endTime: 54.0,
+                toppingKey: "prawn",
+                toppingName: "Udang Diraja",
+                correctMeaning: "Mendoakan keselamatan dan kesejahteraan Raja yang memerintah rakyat serta negara.",
+                distractors: [
+                    "Mendoakan agar raja membina Istana baru.",
+                    "Meminta raja memberikan cuti am yang lebih panjang.",
+                    "Mendoakan kebaikan untuk negara jiran."
+                ]
+            }
+        ];
+
+        let currentActiveBox = null;
+        let boxCompleted = [false, false, false, false];
+        let audioLoopInterval = null;
+        let timeTrackerInterval = null;
+
+        /* STESEN 2 DATA: HISTORY QUIZ ORDER TICKETS */
+        const HISTORY_TICKETS = [
+            {
+                topic: "Tahun Penciptaan",
+                question: "Bilakah sejarah penciptaan Lagu Kebangsaan Persekutuan Tanah Melayu bermula?",
+                correct: "Tahun 1957",
+                distractors: ["Tahun 1945", "Tahun 1963", "Tahun 1990"]
+            },
+            {
+                topic: "Penyertaan Pertandingan",
+                question: "Berapakah jumlah penyertaan yang diterima dalam pertandingan mencipta lagu kebangsaan?",
+                correct: "514 penyertaan",
+                distractors: ["100 penyertaan", "1,000 penyertaan", "50 penyertaan"]
+            },
+            {
+                topic: "Asal Irama Lagu",
+                question: "Siapakah yang mengesyorkan irama lagu kebesaran negeri Perak (Terang Bulan) dijadikan lagu kebangsaan?",
+                correct: "Tunku Abdul Rahman Putra Al-Haj",
+                distractors: ["Tun Abdul Razak", "Sir Gerald Templer", "Jawatankuasa Muzik British"]
+            },
+            {
+                topic: "Peristiwa Berjarah 1957",
+                question: "Di manakah Lagu Negaraku diperdengarkan buat pertama kali pada malam 30 Ogos 1957?",
+                correct: "Padang Kelab Selangor (Dataran Merdeka)",
+                distractors: ["Stadium Merdeka", "Istana Negara", "Dewan Bahasa dan Pustaka"]
+            }
+        ];
+        let currentTicketIndex = 0;
+
+        /* STESEN 3 DATA: ETIKA MENYANYIKAN & MENDENGAR LAGU NEGARAKU */
+        const ETIKA_QUESTIONS = [
+            {
+                question: "Bagaimanakah kedudukan fizikal yang betul semasa menyanyikan lagu Negaraku?",
+                correct: "Berdiri tegak, tangan diletakkan di sisi dan diluruskan ke bawah, kaki dirapatkan.",
+                distractors: [
+                    "Berdiri sambil meletakkan tangan di dalam poket seluar.",
+                    "Duduk dengan bersilang kaki sambil tersenyum.",
+                    "Berdiri sambil melambai-lambaikannya kepada kawan."
+                ]
+            },
+            {
+                question: "Apakah tindakan yang PERLU dilakukan oleh murid yang datang lewat ke sekolah apabila mendengar nyanyian lagu Negaraku?",
+                correct: "Berhenti berjalan serta-merta, meletakkan beg di sisi kaki dan berdiri tegak.",
+                distractors: [
+                    "Terus berlari cepat-cepat ke tapak perhimpunan.",
+                    "Berjalan perlahan-lahan sambil membawa beg di bahu.",
+                    "Bersembunyi di dalam tandas sehingga lagu tamat."
+                ]
+            },
+            {
+                question: "Apakah etika bagi Orang Kurang Upaya (OKU) yang berkerusi roda semasa lagu Kebangsaan dimainkan?",
+                correct: "Kepala mesti tegak, mata memandang bendera, kedua-dua tangan di atas paha & kaki dirapatkan.",
+                distractors: [
+                    "Menggerakkan kerusi roda pusing-pusing.",
+                    "Menutup mata dan menundukkan kepala ke bawah.",
+                    "Meminta orang lain menolak kerusi roda bergerak."
+                ]
+            }
+        ];
+        let currentEtikaIndex = 0;
+
+        /* STESEN 4 DATA: JATI DIRI TOPPINGS */
+        const JATI_DIRI_OPTIONS = [
+            { text: "Melahirkan warganegara yang taat setia kepada raja dan negara", correct: true },
+            { text: "Memupuk perpaduan dan menghormati kepelbagaian kaum, agama serta budaya", correct: true },
+            { text: "Melahirkan warganegara yang berusaha memajukan diri dan bercita-cita tinggi", correct: true },
+            { text: "Memupuk rasa cinta akan negara, berbangga dan bersyukur menjadi rakyat Malaysia", correct: true },
+            { text: "Mencetuskan persaingan tidak sihat dan permusuhan antara kaum", correct: false },
+            { text: "Menggalakkan rakyat mengagungkan budaya dan lagu negara luar", correct: false }
+        ];
+        let selectedJatiCount = 0;
+
+        /* START APPLICATION AFTER REGISTRATION */
+        function handleStartApp(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputName').value.trim();
+            const cls = document.getElementById('inputClass').value.trim();
+
+            if (!name || !cls) return;
+
+            studentData.name = name;
+            studentData.class = cls;
+
+            document.getElementById('displayStudentName').innerText = `Murid: ${name}`;
+            document.getElementById('displayStudentClass').innerText = `Kelas: ${cls}`;
+
+            document.getElementById('screenRegister').classList.add('hidden');
+            document.getElementById('topHeaderStats').classList.remove('hidden');
+            document.getElementById('topHeaderStats').classList.add('flex');
+            document.getElementById('stationTabs').classList.remove('hidden');
+            document.getElementById('stationTabs').classList.add('grid');
+
+            goToStep(1);
+        }
+
+        /* NAVIGATION CONTROL */
+        function goToStep(stepNum) {
+            // Stop any looping audio when switching stations
+            stopAudioLoop();
+
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`station${i}`).classList.add('hidden');
+                const tab = document.getElementById(`tab${i}`);
+                tab.classList.remove('bg-[#8C5A3C]', 'text-yellow-300', 'border-[#6B3E26]');
+                tab.classList.add('bg-white', 'text-gray-400', 'border-gray-300');
+            }
+            document.getElementById('screenReportCard').classList.add('hidden');
+
+            document.getElementById(`station${stepNum}`).classList.remove('hidden');
+            const activeTab = document.getElementById(`tab${stepNum}`);
+            activeTab.classList.remove('bg-white', 'text-gray-400', 'border-gray-300');
+            activeTab.classList.add('bg-[#8C5A3C]', 'text-yellow-300', 'border-[#6B3E26]');
+
+            if (stepNum === 1) setupStation1();
+            if (stepNum === 2) setupStation2();
+            if (stepNum === 3) setupStation3();
+            if (stepNum === 4) setupStation4();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* PENALTY MECHANIC (-2 MARKS) */
+        function triggerPenalty(element) {
+            studentData.score = Math.max(0, studentData.score - 2);
+            studentData.penaltyCount++;
+
+            document.getElementById('currentScore').innerText = studentData.score;
+
+            const penText = document.getElementById('penaltyFloatText');
+            penText.classList.remove('hidden');
+            setTimeout(() => {
+                penText.classList.add('hidden');
+            }, 1000);
+
+            if (element) {
+                element.classList.add('animate-spring-back', 'bg-red-100', 'border-red-400');
+                setTimeout(() => {
+                    element.classList.remove('animate-spring-back', 'bg-red-100', 'border-red-400');
+                }, 600);
+            }
+        }
+
+        /* STESEN 1 LOGIC: BLIND BOX & REPEAT AUDIO LOOP MECHANIC */
+        function setupStation1() {
+            updateStation1NextBtn();
+        }
+
+        function openBlindBox(index) {
+            currentActiveBox = BOX_DATA[index];
+            const boxCard = document.getElementById('activeBoxCard');
+            boxCard.classList.remove('hidden');
+
+            document.getElementById('activeBoxBadge').innerText = `Lirik Kotak #${index + 1}`;
+            document.getElementById('activeLyricText').innerText = `"${currentActiveBox.lyric}"`;
+
+            const shelf = document.getElementById('meaningOptionsShelf');
+            shelf.innerHTML = '';
+
+            const allOptions = [
+                { text: currentActiveBox.correctMeaning, isCorrect: true },
+                ...currentActiveBox.distractors.map(d => ({ text: d, isCorrect: false }))
+            ].sort(() => Math.random() - 0.5);
+
+            allOptions.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-pizza bg-white hover:bg-amber-100 border-2 border-amber-300 p-4 rounded-2xl text-left text-xs font-bold text-[#8C5A3C] shadow-sm transition flex items-center justify-between";
+                btn.innerHTML = `<span>${opt.text}</span>`;
+                btn.onclick = () => handleSelectMeaningOption(opt.isCorrect, btn);
+                shelf.appendChild(btn);
+            });
+
+            // Start Looping Audio Snippet
+            startAudioLoopSnippet(currentActiveBox.startTime, currentActiveBox.endTime);
+        }
+
+        function startAudioLoopSnippet(start, end) {
+            stopAudioLoop();
+
+            const audio = document.getElementById('negarakuAudio');
+            audio.currentTime = start;
+            audio.play().catch(e => console.log("Audio autoplay prevented:", e));
+
+            document.getElementById('audioPlayingIndicator').classList.remove('hidden');
+
+            // Time Tracker & Loop check
+            audioLoopInterval = setInterval(() => {
+                const ct = audio.currentTime;
+                document.getElementById('audioTimeDisplay').innerText = `${ct.toFixed(1)}s`;
+                
+                // If exceeds end time -> Jump back to start time (REPEAT REPEAT REPEAT)
+                if (ct >= end) {
+                    audio.currentTime = start;
+                }
+            }, 100);
+        }
+
+        function stopAudioLoop() {
+            const audio = document.getElementById('negarakuAudio');
+            audio.pause();
+            if (audioLoopInterval) clearInterval(audioLoopInterval);
+            document.getElementById('audioPlayingIndicator').classList.add('hidden');
+        }
+
+        function replayCurrentBoxAudio() {
+            if (currentActiveBox) {
+                startAudioLoopSnippet(currentActiveBox.startTime, currentActiveBox.endTime);
+            }
+        }
+
+        function handleSelectMeaningOption(isCorrect, btnElem) {
+            if (isCorrect) {
+                boxCompleted[currentActiveBox.id] = true;
+                
+                const boxStatus = document.getElementById(`boxStatus${currentActiveBox.id}`);
+                boxStatus.innerText = "Selesai ✓";
+                boxStatus.className = "text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full mt-1 inline-block font-bold";
+                document.getElementById(`blindBox${currentActiveBox.id}`).classList.add('border-green-500', 'bg-green-50');
+
+                addIngredientToPizzaVisual(currentActiveBox.toppingKey, currentActiveBox.toppingName);
+                document.getElementById('activeBoxCard').classList.add('hidden');
+
+                // Stop current audio loop upon correct answer
+                stopAudioLoop();
+
+                updateStation1NextBtn();
+            } else {
+                triggerPenalty(btnElem);
+            }
+        }
+
+        function addIngredientToPizzaVisual(key, name) {
+            const plateText = document.getElementById('pizzaPlateEmptyText');
+            plateText.classList.add('hidden');
+
+            const container = document.getElementById('placedToppingsSvgContainer');
+            const svgDiv = document.createElement('div');
+            svgDiv.className = "flex items-center justify-center p-1";
+            svgDiv.innerHTML = SVG_TOPPINGS[key];
+            container.appendChild(svgDiv);
+
+            const labelContainer = document.getElementById('pizzaPlateContentText');
+            const badge = document.createElement('span');
+            badge.className = "bg-amber-100 text-[#8C5A3C] border border-amber-300 px-3 py-1 rounded-full text-xs shadow-sm flex items-center gap-1";
+            badge.innerHTML = `<i class="fa-solid fa-check text-green-600"></i> ${name}`;
+            labelContainer.appendChild(badge);
+        }
+
+        function updateStation1NextBtn() {
+            const allDone = boxCompleted.every(b => b === true);
+            const btn = document.getElementById('btnNextStep1');
+            if (allDone) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'bg-gray-400', 'cursor-not-allowed');
+                btn.classList.add('bg-[#72A265]', 'hover:bg-[#5E8B52]', 'border-b-4', 'border-[#486B3E]');
+                studentData.completedStations[0] = true;
+            }
+        }
+
+        /* STESEN 2 LOGIC: HISTORY ORDER TICKET */
+        function setupStation2() {
+            renderHistoryTicket();
+        }
+
+        function renderHistoryTicket() {
+            const ticket = HISTORY_TICKETS[currentTicketIndex];
+            document.getElementById('ticketNumberBadge').innerText = `TIKET PESANAN #${currentTicketIndex + 1} / 4`;
+            document.getElementById('ticketTopicBadge').innerText = ticket.topic;
+            document.getElementById('ticketQuestionText').innerText = ticket.question;
+
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`dot${i}`);
+                if (i < currentTicketIndex) {
+                    dot.className = "w-3 h-3 rounded-full bg-green-500";
+                } else if (i === currentTicketIndex) {
+                    dot.className = "w-4 h-4 rounded-full bg-[#E2583E] animate-ping";
+                } else {
+                    dot.className = "w-3 h-3 rounded-full bg-gray-300";
+                }
+            }
+
+            const shelf = document.getElementById('historyOptionsShelf');
+            shelf.innerHTML = '';
+
+            const options = [
+                { text: ticket.correct, isCorrect: true },
+                ...ticket.distractors.map(d => ({ text: d, isCorrect: false }))
+            ].sort(() => Math.random() - 0.5);
+
+            options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-pizza bg-white hover:bg-amber-100 border-2 border-amber-300 p-4 rounded-2xl text-left text-xs font-bold text-[#8C5A3C] shadow-sm transition flex items-center justify-between";
+                btn.innerHTML = `<span>${opt.text}</span>`;
+                btn.onclick = () => handleSelectHistoryOption(opt.isCorrect, btn);
+                shelf.appendChild(btn);
+            });
+        }
+
+        function handleSelectHistoryOption(isCorrect, btnElem) {
+            if (isCorrect) {
+                currentTicketIndex++;
+                if (currentTicketIndex < HISTORY_TICKETS.length) {
+                    renderHistoryTicket();
+                } else {
+                    document.getElementById('ticketQuestionText').innerText = "Semua Tiket Pesanan Sejarah Telah Berjaya Disiapkan!";
+                    document.getElementById('historyOptionsShelf').innerHTML = `
+                        <div class="col-span-2 bg-green-100 border-2 border-green-400 text-green-800 p-4 rounded-2xl text-center font-bold">
+                            <i class="fa-solid fa-circle-check text-2xl mb-1"></i><br>Tahniah! Resepi Sejarah Lagu Kebangsaan Selesai!
+                        </div>
+                    `;
+                    const btn = document.getElementById('btnNextStep2');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'bg-gray-400', 'cursor-not-allowed');
+                    btn.classList.add('bg-[#72A265]', 'hover:bg-[#5E8B52]', 'border-b-4', 'border-[#486B3E]');
+                    studentData.completedStations[1] = true;
+                }
+            } else {
+                triggerPenalty(btnElem);
+            }
+        }
+
+        /* STESEN 3 LOGIC: KARAOKE & ETIKA */
+        function setupStation3() {
+            renderEtikaQuestion();
+        }
+
+        function playFullKaraoke() {
+            stopAudioLoop();
+            const audio = document.getElementById('negarakuAudio');
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log(e));
+
+            const lines = [
+                { id: 'kLine1', time: 8.0 },
+                { id: 'kLine2', time: 19.0 },
+                { id: 'kLine3', time: 31.0 },
+                { id: 'kLine4', time: 43.0 }
+            ];
+
+            const checkInterval = setInterval(() => {
+                const ct = audio.currentTime;
+                lines.forEach((lineObj, idx) => {
+                    const nextTime = lines[idx + 1] ? lines[idx + 1].time : 54.0;
+                    const elem = document.getElementById(lineObj.id);
+                    if (ct >= lineObj.time && ct < nextTime) {
+                        elem.className = "font-heading text-xl md:text-2xl text-yellow-300 font-extrabold scale-105 transition-all duration-300";
+                    } else {
+                        elem.className = "font-heading text-lg text-amber-200 opacity-60 transition-all duration-300";
+                    }
+                });
+
+                if (audio.paused || ct >= 54.0) {
+                    clearInterval(checkInterval);
+                }
+            }, 200);
+        }
+
+        function renderEtikaQuestion() {
+            const qData = ETIKA_QUESTIONS[currentEtikaIndex];
+            document.getElementById('etikaQuestionBadge').innerText = `Soalan ${currentEtikaIndex + 1} / 3`;
+            document.getElementById('etikaQuestionText').innerText = qData.question;
+
+            const shelf = document.getElementById('etikaOptionsShelf');
+            shelf.innerHTML = '';
+
+            const opts = [
+                { text: qData.correct, isCorrect: true },
+                ...qData.distractors.map(d => ({ text: d, isCorrect: false }))
+            ].sort(() => Math.random() - 0.5);
+
+            opts.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-pizza bg-white hover:bg-amber-100 border-2 border-amber-300 p-4 rounded-2xl text-left text-xs font-bold text-[#8C5A3C] shadow-sm transition flex items-center justify-between";
+                btn.innerHTML = `<span>${opt.text}</span>`;
+                btn.onclick = () => handleSelectEtikaOption(opt.isCorrect, btn);
+                shelf.appendChild(btn);
+            });
+        }
+
+        function handleSelectEtikaOption(isCorrect, btnElem) {
+            if (isCorrect) {
+                currentEtikaIndex++;
+                if (currentEtikaIndex < ETIKA_QUESTIONS.length) {
+                    renderEtikaQuestion();
+                } else {
+                    document.getElementById('etikaQuestionText').innerText = "Semua Soalan Etika & Penalti Undang-undang Telah Berjaya Dijawab!";
+                    document.getElementById('etikaOptionsShelf').innerHTML = `
+                        <div class="col-span-2 bg-green-100 border-2 border-green-400 text-green-800 p-4 rounded-2xl text-center font-bold">
+                            <i class="fa-solid fa-circle-check text-2xl mb-1"></i><br>Tahniah! Anda Memahami Etika & Penghayatan Lagu Kebangsaan!
+                        </div>
+                    `;
+                    const btn = document.getElementById('btnNextStep3');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'bg-gray-400', 'cursor-not-allowed');
+                    btn.classList.add('bg-[#72A265]', 'hover:bg-[#5E8B52]', 'border-b-4', 'border-[#486B3E]');
+                    studentData.completedStations[2] = true;
+                }
+            } else {
+                triggerPenalty(btnElem);
+            }
+        }
+
+        /* STESEN 4 LOGIC: BINA PIZZA JATI DIRI */
+        function setupStation4() {
+            const shelf = document.getElementById('jatiDiriShelf');
+            shelf.innerHTML = '';
+            selectedJatiCount = 0;
+            document.getElementById('selectedJatiCount').innerText = selectedJatiCount;
+
+            const opts = [...JATI_DIRI_OPTIONS].sort(() => Math.random() - 0.5);
+
+            opts.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-pizza bg-white hover:bg-amber-100 border-2 border-amber-300 p-4 rounded-2xl text-left text-xs font-bold text-[#8C5A3C] shadow-sm transition flex items-center justify-between";
+                btn.innerHTML = `<span>${opt.text}</span>`;
+                btn.onclick = () => handleSelectJatiOption(opt.correct, btn);
+                shelf.appendChild(btn);
+            });
+        }
+
+        function handleSelectJatiOption(isCorrect, btnElem) {
+            if (btnElem.disabled) return;
+
+            if (isCorrect) {
+                btnElem.disabled = true;
+                btnElem.className = "bg-green-100 border-2 border-green-500 p-4 rounded-2xl text-left text-xs font-bold text-green-800 shadow-sm flex items-center justify-between";
+                btnElem.innerHTML += `<i class="fa-solid fa-circle-check text-green-600 text-lg"></i>`;
+
+                selectedJatiCount++;
+                document.getElementById('selectedJatiCount').innerText = selectedJatiCount;
+
+                if (selectedJatiCount >= 4) {
+                    const btn = document.getElementById('btnFinishAssessment');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'bg-gray-400', 'cursor-not-allowed');
+                    btn.classList.add('bg-[#72A265]', 'hover:bg-[#5E8B52]', 'border-b-4', 'border-[#486B3E]');
+                    studentData.completedStations[3] = true;
+                }
+            } else {
+                triggerPenalty(btnElem);
+            }
+        }
+
+        /* COMPLETE ASSESSMENT & GENERATE REPORT CARD */
+        function completeAssessment() {
+            stopAudioLoop();
+
+            document.getElementById('stationTabs').classList.add('hidden');
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`station${i}`).classList.add('hidden');
+            }
+
+            document.getElementById('rcStudentName').innerText = studentData.name;
+            document.getElementById('rcStudentClass').innerText = studentData.class;
+            
+            const now = new Date();
+            document.getElementById('rcDate').innerText = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+            
+            const totalPenaltyDeduction = studentData.penaltyCount * 2;
+            document.getElementById('rcPenalties').innerText = `${studentData.penaltyCount} kali (-${totalPenaltyDeduction} markah)`;
+
+            document.getElementById('rcFinalScore').innerText = `${studentData.score}%`;
+
+            const score = studentData.score;
+            let tp = "TP 6 - SANGAT BAIK";
+            let desc = "Menghayati, memahami lirik, etika, dan sejarah lagu kebangsaan serta mengamalkan nilai jati diri warganegara secara cemerlang.";
+
+            if (score < 60) {
+                tp = "TP 3 - MEMATUHI";
+                desc = "Memahami asas lirik dan etika lagu kebangsaan dengan bimbingan guru.";
+            } else if (score < 80) {
+                tp = "TP 4 - BAIK";
+                desc = "Menguasai tajuk lagu kebangsaan, sejarah 1957, dan etika menyanyi dengan baik.";
+            } else if (score < 90) {
+                tp = "TP 5 - SANGAT KEPUASAN";
+                desc = "Sangat mahir menghayati lirik, etika, dan peranan lagu kebangsaan dalam perpaduan.";
+            }
+
+            document.getElementById('rcTpGrade').innerText = tp;
+            document.getElementById('rcTpDesc').innerText = desc;
+
+            document.getElementById('screenReportCard').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function restartApp() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
